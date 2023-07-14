@@ -29,7 +29,6 @@ import com.peasenet.gui.mod.render.GuiRadar
 import com.peasenet.main.GavinsMod
 import com.peasenet.main.GavinsModClient
 import com.peasenet.main.Mods
-import com.peasenet.mods.Mod
 import com.peasenet.mods.Type
 import com.peasenet.mods.render.waypoints.Waypoint
 import com.peasenet.settings.SettingBuilder
