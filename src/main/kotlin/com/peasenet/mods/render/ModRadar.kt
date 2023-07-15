@@ -78,7 +78,7 @@ class ModRadar : RenderMod(
     }
 
     override fun onRenderInGameHud(drawContext: DrawContext, delta: Float) {
-        var canRender = isActive && !Mods.isActive(Type.MOD_GUI) && !Mods.isActive(Type.SETTINGS)
+        var canRender = isActive && !Mods.isActive("gui") && !Mods.isActive("settings")
         canRender = canRender || GuiRadar.visible
         if (!canRender) return
         val stack = drawContext.matrices
