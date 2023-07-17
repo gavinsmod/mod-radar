@@ -26,13 +26,10 @@ import com.peasenet.gavui.math.BoxF
 import com.peasenet.gavui.math.PointF
 import com.peasenet.gavui.util.GuiUtil
 import com.peasenet.gui.mod.render.GuiRadar
-import com.peasenet.main.GavinsMod
-import com.peasenet.main.GavinsModClient
 import com.peasenet.main.Mods
-import com.peasenet.mods.Type
-import com.peasenet.mods.render.waypoints.Waypoint
 import com.peasenet.settings.SettingBuilder
 import com.peasenet.util.listeners.InGameHudRenderListener
+import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.entity.Entity
@@ -62,7 +59,7 @@ class ModRadar : RenderMod(
     init {
         val clickSetting = SettingBuilder()
             .setTitle("gavinsmod.settings.radar.drawn")
-            .setCallback { GavinsModClient.minecraftClient.setScreen(GuiRadar()) }
+            .setCallback { MinecraftClient.getInstance().setScreen(GuiRadar()) }
             .buildClickSetting()
         addSetting(clickSetting)
     }
@@ -93,31 +90,6 @@ class ModRadar : RenderMod(
         )
         drawEntitiesOnRadar(stack)
         GuiUtil.drawOutline(radarBox, stack)
-        if (radarConfig.isShowWaypoint) drawWaypointsOnRadar(stack)
-    }
-
-    /**
-     * Draws enabled waypoints on the radar.
-     *
-     * @param stack - The matrix stack.
-     */
-    private fun drawWaypointsOnRadar(stack: MatrixStack) {
-        val player = client.getPlayer()
-
-        val yaw = player.yaw
-        val waypoints =
-            GavinsMod.waypointConfig.getLocations().stream().filter { obj: Waypoint -> obj.isEnabled }.toList()
-        for (w in waypoints) {
-            var color = w.color
-            if (!radarConfig.isUseWaypointColor) color = radarConfig.waypointColor
-            val location = getScaledPos(getPointRelativeToYaw(w.pos, yaw))
-            GuiUtil.drawBox(
-                color,
-                BoxF(location, radarConfig.pointSize.toFloat(), radarConfig.pointSize.toFloat()),
-                stack,
-                radarConfig.pointAlpha
-            )
-        }
     }
 
     /**
