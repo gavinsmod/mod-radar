@@ -27,6 +27,7 @@ import com.peasenet.gavui.math.PointF
 import com.peasenet.gavui.util.GuiUtil
 import com.peasenet.gui.mod.render.GuiRadar
 import com.peasenet.main.Mods
+import com.peasenet.main.Settings
 import com.peasenet.settings.SettingBuilder
 import com.peasenet.util.listeners.InGameHudRenderListener
 import net.minecraft.client.MinecraftClient
@@ -79,14 +80,14 @@ class ModRadar : RenderMod(
         canRender = canRender || GuiRadar.visible
         if (!canRender) return
         val stack = drawContext.matrices
-        RadarConfig.x = client.window.scaledWidth - radarConfig.size - 10
+        RadarConfig.x = client.window.scaledWidth - config.size - 10
         val radarBox = BoxF(
             PointF(RadarConfig.x.toFloat(), RadarConfig.y.toFloat()),
-            radarConfig.size.toFloat(),
-            radarConfig.size.toFloat()
+            config.size.toFloat(),
+            config.size.toFloat()
         )
         GuiUtil.drawBox(
-            radarConfig.backgroundColor, radarBox, stack, radarConfig.backgroundAlpha
+            config.backgroundColor, radarBox, stack, config.backgroundAlpha
         )
         drawEntitiesOnRadar(stack)
         GuiUtil.drawOutline(radarBox, stack)
@@ -109,18 +110,18 @@ class ModRadar : RenderMod(
             val point = getScaledPos(getPointRelativeToYaw(entity.pos, yaw))
             GuiUtil.drawBox(
                 color,
-                BoxF(point, radarConfig.pointSize.toFloat(), radarConfig.pointSize.toFloat()),
+                BoxF(point, config.pointSize.toFloat(), config.pointSize.toFloat()),
                 stack,
-                radarConfig.pointAlpha
+                config.pointAlpha
             )
         }
     }
 
     private fun getColorFromEntity(entity: Entity): Color {
-        if (entity is PlayerEntity) return radarConfig.playerColor
-        if (entity is ItemEntity) return radarConfig.itemColor
-        if (entity.type.spawnGroup.isPeaceful) return radarConfig.peacefulMobColor
-        return if (!entity.type.spawnGroup.isPeaceful) radarConfig.hostileMobColor else Colors.WHITE
+        if (entity is PlayerEntity) return config.playerColor
+        if (entity is ItemEntity) return config.itemColor
+        if (entity.type.spawnGroup.isPeaceful) return config.peacefulMobColor
+        return if (!entity.type.spawnGroup.isPeaceful) config.hostileMobColor else Colors.WHITE
     }
 
     /**
@@ -135,8 +136,8 @@ class ModRadar : RenderMod(
 
         // offset the point to the center of the radar.
         newLoc = PointF(
-            newLoc.x + RadarConfig.x + radarConfig.size / 2f,
-            newLoc.y + RadarConfig.y + radarConfig.size / 2f
+            newLoc.x + RadarConfig.x + config.size / 2f,
+            newLoc.y + RadarConfig.y + config.size / 2f
         )
         return newLoc
     }
@@ -149,20 +150,20 @@ class ModRadar : RenderMod(
      */
     private fun clampPoint(point: PointF): PointF {
         var newPoint = point
-        val offset = radarConfig.pointSize - pointOffset
+        val offset = config.pointSize - pointOffset
         // if the point is touching any edges of the radar, clamp it to the edge.
         // right side
-        if (newPoint.x >= radarConfig.size / 2f - offset) newPoint =
-            PointF(radarConfig.size / 2f - offset, newPoint.y)
+        if (newPoint.x >= config.size / 2f - offset) newPoint =
+            PointF(config.size / 2f - offset, newPoint.y)
         // left side
-        if (newPoint.x <= -radarConfig.size / 2f + pointOffset) newPoint =
-            PointF(-radarConfig.size / 2f + pointOffset, newPoint.y)
+        if (newPoint.x <= -config.size / 2f + pointOffset) newPoint =
+            PointF(-config.size / 2f + pointOffset, newPoint.y)
         // bottom side
-        if (newPoint.y >= radarConfig.size / 2f - offset) newPoint =
-            PointF(newPoint.x, radarConfig.size / 2f - offset)
+        if (newPoint.y >= config.size / 2f - offset) newPoint =
+            PointF(newPoint.x, config.size / 2f - offset)
         // top side
-        if (newPoint.y <= -radarConfig.size / 2f + pointOffset) newPoint =
-            PointF(newPoint.x, -radarConfig.size / 2f + pointOffset)
+        if (newPoint.y <= -config.size / 2f + pointOffset) newPoint =
+            PointF(newPoint.x, -config.size / 2f + pointOffset)
         // offset the point to be centered
 
         return newPoint.subtract(PointF(pointOffset, pointOffset))
@@ -175,11 +176,11 @@ class ModRadar : RenderMod(
      * @return Whether the given entity can be rendered on the radar.
      */
     private fun canRenderEntity(entity: Entity): Boolean {
-        if (entity is PlayerEntity) return radarConfig.isShowPlayer
+        if (entity is PlayerEntity) return config.isShowPlayer
         if (entity is MobEntity) {
-            return if (!entity.getType().spawnGroup.isPeaceful) radarConfig.isShowHostileMob else radarConfig.isShowPeacefulMob
+            return if (!entity.getType().spawnGroup.isPeaceful) config.isShowHostileMob else config.isShowPeacefulMob
         }
-        return if (entity is ItemEntity) radarConfig.isShowItem else false
+        return if (entity is ItemEntity) config.isShowItem else false
     }
 
     /**
@@ -199,13 +200,19 @@ class ModRadar : RenderMod(
 
     companion object {
 
+
+        val config: RadarConfig
+            get() {
+                return Settings.getConfig<RadarConfig>("radar")
+            }
+
         val pointOffset: Float
             /**
              * Calculates the offset to draw the points on the radar.
              *
              * @return The offset to draw the points on the radar.
              */
-            get() = if (radarConfig.pointSize == 1) 0F else (radarConfig.pointSize - 1) / 2F
+            get() = if (config.pointSize == 1) 0F else (config.pointSize - 1) / 2F
 
         /**
          * Calculates the position and distance of the given coordinates from the player.
