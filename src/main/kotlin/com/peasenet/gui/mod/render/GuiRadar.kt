@@ -26,8 +26,11 @@ import com.peasenet.gavui.GuiBuilder
 import com.peasenet.gavui.math.PointF
 import com.peasenet.gui.GuiElement
 import com.peasenet.main.GavinsMod
+import com.peasenet.main.Mods
 import com.peasenet.main.Settings
+import com.peasenet.mods.render.ModRadar
 import com.peasenet.settings.*
+import net.minecraft.client.gui.DrawContext
 import net.minecraft.text.Text
 
 /**
@@ -286,38 +289,26 @@ class GuiRadar : GuiElement(Text.translatable("gavinsmod.mod.render.radar")) {
             it.width = (maxWidth + 10).toFloat()
         }
         pos = PointF(paddingX, paddingY + gapY)
-        playerEntityColor.setPos(pos)
+        playerEntityColor.gui.position = pos
         pos = pos.add(playerEntityColor.getWidth() + padding, 0f)
-        hostileEntityColor.setPos(pos)
         pos = PointF(paddingX, pos.y + gapY)
-        peacefulEntityColor.setPos(pos)
         pos = pos.add(peacefulEntityColor.getWidth() + padding, 0f)
-        entityItemColor.setPos(pos)
         pos = PointF(paddingX, pos.y + gapY)
-        backgroundColor.setPos(pos)
         pos = PointF(paddingX, pos.y + gapY)
         scaleTitle.position = (pos)
         pos = PointF(paddingX, pos.y + gapY)
-        pointSizeSetting.setPos(pos)
         pos = pos.add(pointSizeSetting.getWidth() + padding, 0f)
-        scaleSetting.setPos(pos)
         pos = PointF(paddingX, pos.y + gapY)
 
         toggleTitle.position = pos
         pos = PointF(paddingX, pos.y + gapY)
-        playerEntityToggle.setPos(pos)
         pos = pos.add(playerEntityToggle.getWidth() + padding, 0f)
-        hostileEntityToggle.setPos(pos)
         pos = PointF(paddingX, pos.y + gapY)
-        peacefulEntityToggle.setPos(pos)
         pos = pos.add(peacefulEntityToggle.getWidth() + padding, 0f)
-        itemToggle.setPos(pos)
         pos = PointF(paddingX, pos.y + gapY)
         alphaTitle.position = pos
         pos = PointF(paddingX, pos.y + gapY)
-        backgroundAlpha.setPos(pos)
         pos = pos.add(backgroundAlpha.getWidth() + padding, 0f)
-        pointAlpha.setPos(pos)
 
 
 
@@ -351,6 +342,12 @@ class GuiRadar : GuiElement(Text.translatable("gavinsmod.mod.render.radar")) {
     private fun updateScaleText(setting: ClickSetting, value: Int) {
         setting.gui.title =
             (Text.translatable(setting.gui.translationKey).append(Text.literal(" (%s)".format(value))))
+    }
+
+    override fun render(drawContext: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+        super.render(drawContext, mouseX, mouseY, delta)
+        val radar = Mods.getMod("radar") as ModRadar
+        radar.onRenderInGameHud(drawContext, delta)
     }
 
 }
